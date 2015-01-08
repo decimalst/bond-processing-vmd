@@ -106,6 +106,7 @@ int simulation_test() {
   std::cout << "number of frames " << newsim->get_number_of_frames()
             << std::endl;
   newsim->calculate_deuterium_order_parameter();
+  newsim->calculate_first_and_second_legendre();
   return 1;
 }
 

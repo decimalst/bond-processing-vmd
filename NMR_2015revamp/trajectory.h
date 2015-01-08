@@ -17,6 +17,7 @@ class trajectory{
   std::vector<vector_3d> trajectory_array;
  public:
   vector_3d get_Frame(int);
+  void set_number_of_frames(int);
   std::vector<vector_3d>* get_trajectory_array();
   trajectory(int,std::vector<vector_3d>);
   trajectory();

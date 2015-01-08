@@ -8,6 +8,7 @@
 #ifndef SIMULATION_H_
 #define SIMULATION_H_
 #include "molecule.h"
+#include <fstream>
 #include "trajectory.h"
 class simulation{
   std::vector<molecule_bond>* molecules;

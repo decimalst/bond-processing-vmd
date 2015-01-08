@@ -14,6 +14,9 @@ vector_3d trajectory::get_Frame(int frame){
     return vector_3d();
   }
 }
+void trajectory::set_number_of_frames(int input){
+  number_of_frames=input;
+}
 trajectory::trajectory(int numb_frames, std::vector<vector_3d> data){
    number_of_frames=numb_frames;
     trajectory_array=data;
