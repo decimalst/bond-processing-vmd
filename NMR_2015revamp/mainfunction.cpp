@@ -109,10 +109,26 @@ int simulation_test() {
   newsim->calculate_first_and_second_legendre();
   return 1;
 }
+void debug_test(){
+  fileinput* test_file = new fileinput(
+       "debug_test.xyz", "debug", "debug");
+   std::vector<molecule_bond>* test_mol_bond;
+   test_mol_bond = test_file->loadmolecules();
+   simulation * newsim;
+   newsim = new simulation(
+       test_mol_bond);
+   std::cout << "number of molecules " << newsim->get_number_of_molecules()
+             << std::endl;
+   std::cout << "number of frames " << newsim->get_number_of_frames()
+             << std::endl;
+   newsim->calculate_deuterium_order_parameter();
+   newsim->calculate_first_and_second_legendre();
+}
 
 int main(void) {
-  coords_3d_test();
-  vector_3d_test();
-  fileinput_test();
+//  coords_3d_test();
+//  vector_3d_test();
+//  fileinput_test();
   simulation_test();
+//  debug_test();
 }
