@@ -154,6 +154,9 @@ std::vector<molecule_bond>* fileinput::loadmolecules() {
     bonds_per_carbon = dppccarbonssn1bonds[index_of_size];
 
   }
+  if (lipid_name =="debug"){
+    bonds_per_carbon=2;
+  }
 //Reads through .xyz file one line at a time, for each molecule, creates a trajectory for each C-H bond
 //Control loop variables
   int current_frame = 0;

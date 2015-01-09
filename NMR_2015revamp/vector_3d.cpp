@@ -37,7 +37,7 @@ float vector_3d::get_magnitude(){
 float vector_3d::get_angle_from(vector_3d* input){
 //Get angle from a given vector, using the dot product
 //Given in degrees
-  return acos(get_dot_product(input)/(get_magnitude()*input->get_magnitude())) * (180/3.14159265);
+  return acos(get_dot_product(input)/(get_magnitude()*input->get_magnitude()));
 }
 
 vector_3d::vector_3d(float x, float y, float z){
