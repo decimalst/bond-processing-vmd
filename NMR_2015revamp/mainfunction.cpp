@@ -95,7 +95,7 @@ int fileinput_test() {
 }
 int simulation_test() {
   fileinput* test_file = new fileinput(
-      "DOPC-C22.xyz", "C22", "dopc");
+      "DOPC-C27.xyz", "C27", "dopc");
   std::vector<molecule_bond>* test_mol_bond;
   test_mol_bond = test_file->loadmolecules();
   simulation * newsim;

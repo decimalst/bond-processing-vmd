@@ -153,19 +153,19 @@ void simulation::calculate_first_and_second_legendre() {
       }
       //Average float sums of products by (1/number_of_frames-spacing(j) )
 //      std::cout << "j= " << j << " " << "x0xt_sum" << x0xt_sum << std::endl;
-      x0xt_sum = x0xt_sum * (1.0 / (double)(number_of_frames-j));
+      x0xt_sum = x0xt_sum * (1.0 / ((double)(number_of_frames-j)));
 //      std::cout << "j= " << j << " " << "x0xt_sum" << x0xt_sum << std::endl;
-      y0yt_sum = y0yt_sum * (1.0 / (double)(number_of_frames-j));
-      z0zt_sum = z0zt_sum * (1.0 / (double)(number_of_frames-j));
-      x0xt_squared_sum = x0xt_squared_sum * (1.0 / (double)(number_of_frames-j));
-      y0yt_squared_sum = y0yt_squared_sum * (1.0 / (double)(number_of_frames-j));
-      z0zt_squared_sum = z0zt_squared_sum * (double)(1.0 / (number_of_frames-j));
-      x0y0xtyt_sum = x0y0xtyt_sum * (1.0 / (double)(number_of_frames-j));
-      x0z0xtzt_sum = x0z0xtzt_sum * (1.0 / (double)(number_of_frames-j));
-      y0z0ytzt_sum = y0z0ytzt_sum * (1.0 / (double)(number_of_frames-j));
+      y0yt_sum = y0yt_sum * (1.0 / ((double)(number_of_frames-j)));
+      z0zt_sum = z0zt_sum * (1.0 / ((double)(number_of_frames-j)));
+      x0xt_squared_sum = x0xt_squared_sum * (1.0 / ((double)(number_of_frames-j)));
+      y0yt_squared_sum = y0yt_squared_sum * (1.0 / ((double)(number_of_frames-j)));
+      z0zt_squared_sum = z0zt_squared_sum * (1.0 / ((double)(number_of_frames-j)));
+      x0y0xtyt_sum = x0y0xtyt_sum * (1.0 / ((double)(number_of_frames-j)));
+      x0z0xtzt_sum = x0z0xtzt_sum * (1.0 / ((double)(number_of_frames-j)));
+      y0z0ytzt_sum = y0z0ytzt_sum * (1.0 / ((double)(number_of_frames-j)));
 
       //Store into results_array(t+=) as a result associated with the value of spacing
-      first_x.at(j) = first_x.at(j)+ (x0xt_sum);
+      first_x.at(j) += (x0xt_sum);
       first_y.at(j) += (y0yt_sum);
       first_z.at(j) += (z0zt_sum);
       second_xsquare.at(j) += (x0xt_squared_sum);
@@ -190,15 +190,15 @@ void simulation::calculate_first_and_second_legendre() {
   //Now that we have the ensemble sum stored into the arrays, we need to average it by ensemble
   //So multiply by 1/number_of_molecules each value we got for some time sep
   for (int i = 0; i < number_of_frames; i++) {
-    first_x.at(i) = first_x.at(i) * (1.0 / ((double)number_of_molecules));
-    first_y.at(i) = first_y.at(i) * (1.0 / ((double)number_of_molecules));
-    first_z.at(i) = first_z.at(i) * (1.0 / ((double)number_of_molecules));
-    second_xsquare.at(i) = second_xsquare.at(i) * (1.0 / ((double)number_of_molecules));
-    second_ysquare.at(i) = second_ysquare.at(i) * (1.0 /((double)number_of_molecules));
-    second_zsquare.at(i) = second_zsquare.at(i) * (1.0/((double)number_of_molecules));
-    second_xy.at(i) = second_xy.at(i) * (1.0 / ((double)number_of_molecules));
-    second_xz.at(i) = second_xz.at(i) * (1.0 / ((double)number_of_molecules));
-    second_yz.at(i) = second_yz.at(i) * (1.0 / ((double)number_of_molecules));
+    first_x.at(i) = first_x.at(i) * (1.0 / (((double)number_of_molecules)));
+    first_y.at(i) = first_y.at(i) * (1.0 / (((double)number_of_molecules)));
+    first_z.at(i) = first_z.at(i) * (1.0 / (((double)number_of_molecules)));
+    second_xsquare.at(i) = second_xsquare.at(i) * (1.0 / (((double)number_of_molecules)));
+    second_ysquare.at(i) = second_ysquare.at(i) * (1.0 /(((double)number_of_molecules)));
+    second_zsquare.at(i) = second_zsquare.at(i) * (1.0/(((double)number_of_molecules)));
+    second_xy.at(i) = second_xy.at(i) * (1.0 / (((double)number_of_molecules)));
+    second_xz.at(i) = second_xz.at(i) * (1.0 / (((double)number_of_molecules)));
+    second_yz.at(i) = second_yz.at(i) * (1.0 / (((double)number_of_molecules)));
   }
 
   //Now write all our values to a file
@@ -210,7 +210,7 @@ void simulation::calculate_first_and_second_legendre() {
                     << "<x(0)z(0)x(t)z(t)>" << " " << "<y(0)z(0)y(t)z(t)>" << " "
                     << "C1" << " " << "C2"
                     << std::endl;
-  float first_legendre, second_legendre;
+  double first_legendre, second_legendre;
   for (int i = 0; i < number_of_frames; i++) {
     first_legendre= first_x.at(i) + first_y.at(i)+first_z.at(i);
     second_legendre=1.5*(second_xsquare.at(i) + second_ysquare.at(i) + second_zsquare.at(i) + (2.0*second_xy.at(i))+ (2.0*second_xz.at(i))+(2.0*second_yz.at(i)))-0.5;

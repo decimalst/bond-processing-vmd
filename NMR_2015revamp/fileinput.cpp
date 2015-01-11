@@ -176,7 +176,7 @@ std::vector<molecule_bond>* fileinput::loadmolecules() {
   bondholder = new std::vector<molecule_bond>;
 
 //Holder variables used in inputting the float values from the file
-  float temp_x, temp_y, temp_z;
+  double temp_x, temp_y, temp_z;
 //Holder variable for the string in the first column
   std::string identifier_holder;
 
