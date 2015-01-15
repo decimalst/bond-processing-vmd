@@ -59,9 +59,9 @@ vector_3d::vector_3d(coords_3d source, coords_3d dest){
   temp_y=dest.getY() - source.getY();
   temp_z=dest.getZ() - source.getZ();
   magnitude= sqrt(pow(temp_x,2) + pow(temp_y,2) + pow(temp_z,2));
-  temp_x=temp_x*(1/magnitude);
-  temp_y=temp_y*(1/magnitude);
-  temp_z=temp_z*(1/magnitude);
+  temp_x=temp_x*(1.0/magnitude);
+  temp_y=temp_y*(1.0/magnitude);
+  temp_z=temp_z*(1.0/magnitude);
   x_coord=temp_x;
   y_coord=temp_y;
   z_coord=temp_z;

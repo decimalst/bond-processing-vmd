@@ -17,16 +17,12 @@
 #include "simulation.h"
 
 int coords_3d_test() {
-  coords_3d* derp = new coords_3d(
-      0.0, 0.0, 0.0);
+  coords_3d* derp = new coords_3d(0.0, 0.0, 0.0);
   std::cout << derp->getX() << " " << derp->getY() << " " << derp->getZ()
             << std::endl;
-  derp->setX(
-      0.1);
-  derp->setY(
-      0.2);
-  derp->setZ(
-      0.3);
+  derp->setX(0.1);
+  derp->setY(0.2);
+  derp->setZ(0.3);
   std::cout << derp->getX() << " " << derp->getY() << " " << derp->getZ()
             << std::endl;
   delete derp;
@@ -39,23 +35,19 @@ int vector_3d_test() {
   return 1;
 }
 int fileinput_test() {
-  fileinput* test = new fileinput(
-      "somefile.xyz", "test", "test");
+  fileinput* test = new fileinput("somefile.xyz", "test", "test");
   test->is_file_valid();
-  fileinput* test2 = new fileinput(
-      "somefile.zyx", "test", "test");
+  fileinput* test2 = new fileinput("somefile.zyx", "test", "test");
   test2->is_file_valid();
   delete test;
   delete test2;
-  fileinput* test3 = new fileinput(
-      "test.xyz", "test", "test");
+  fileinput* test3 = new fileinput("test.xyz", "test", "test");
   test3->is_file_valid();
   std::cout << test3->find_atom_count() << std::endl;
   std::cout << test3->get_line_number() << std::endl;
   delete test3;
   //Test loadmolecules() for "DOPC-C22.xyz"
-  fileinput* test4 = new fileinput(
-      "DOPC-C22.xyz", "C22", "dopc");
+  fileinput* test4 = new fileinput("DOPC-C22.xyz", "C22", "dopc");
   std::vector<molecule_bond> test_mol_bond;
   test_mol_bond = *test4->loadmolecules();
   std::cout << "test_mol_bond size " << test_mol_bond.size() << std::endl;
@@ -94,13 +86,11 @@ int fileinput_test() {
   return 1;
 }
 int simulation_test() {
-  fileinput* test_file = new fileinput(
-      "DOPC-C27.xyz", "C27", "dopc");
+  fileinput* test_file = new fileinput("DOPC-C27.xyz", "C27", "dopc");
   std::vector<molecule_bond>* test_mol_bond;
   test_mol_bond = test_file->loadmolecules();
   simulation * newsim;
-  newsim = new simulation(
-      test_mol_bond);
+  newsim = new simulation(test_mol_bond);
   std::cout << "number of molecules " << newsim->get_number_of_molecules()
             << std::endl;
   std::cout << "number of frames " << newsim->get_number_of_frames()
@@ -109,26 +99,74 @@ int simulation_test() {
   newsim->calculate_first_and_second_legendre();
   return 1;
 }
-void debug_test(){
-  fileinput* test_file = new fileinput(
-       "debug_test.xyz", "debug", "debug");
-   std::vector<molecule_bond>* test_mol_bond;
-   test_mol_bond = test_file->loadmolecules();
-   simulation * newsim;
-   newsim = new simulation(
-       test_mol_bond);
-   std::cout << "number of molecules " << newsim->get_number_of_molecules()
-             << std::endl;
-   std::cout << "number of frames " << newsim->get_number_of_frames()
-             << std::endl;
-   newsim->calculate_deuterium_order_parameter();
-   newsim->calculate_first_and_second_legendre();
+void debug_test() {
+  fileinput* test_file = new fileinput("debug_test.xyz", "debug", "debug");
+  std::vector<molecule_bond>* test_mol_bond;
+  test_mol_bond = test_file->loadmolecules();
+  simulation * newsim;
+  newsim = new simulation(test_mol_bond);
+  std::cout << "number of molecules " << newsim->get_number_of_molecules()
+            << std::endl;
+  std::cout << "number of frames " << newsim->get_number_of_frames()
+            << std::endl;
+  newsim->calculate_deuterium_order_parameter();
+  newsim->calculate_first_and_second_legendre();
 }
 
 int main(void) {
 //  coords_3d_test();
 //  vector_3d_test();
 //  fileinput_test();
-  simulation_test();
+// simulation_test();
 //  debug_test();
+  int choice;
+  std::string inputchoice;
+  bool isvalid = false;
+  std::string filename;
+  std::string carbonname;
+  std::string lipidname;
+  std::cout << "Please input .xyz file name" << std::endl;
+
+  std::cin >> filename;
+  std::cout << "Please input carbon name(e.g. 'C22')" << std::endl;
+  std::cin >> carbonname;
+  std::cout << "Please input lipid name(e.g. 'dopc')" << std::endl;
+  std::cin >> lipidname;
+  std::cout << "You have selected " << lipidname << " carbon: " << carbonname
+            << " from file " << filename << std::endl;
+  std::cout
+      << "Input 1 to calculate SCD parameter only, input 2 to calculate first and second Legendre polynomial only, input 3 to calculate both"
+      << std::endl;
+
+  std::cin >> inputchoice;
+  choice=stoi(inputchoice);
+  if (choice == 1 || choice == 2 || choice == 3) {
+    isvalid=true;
+  }
+  while (!isvalid) {
+      std::cout << "Invalid choice, try again" << std::endl;
+      isvalid = false;
+      std::cin >> inputchoice;
+      choice=stoi(inputchoice);
+      if (choice == 1 || choice == 2 || choice == 3) {
+          isvalid=true;
+        }
+  }
+
+  fileinput* working = new fileinput(filename, carbonname, lipidname);
+  working->is_file_valid();
+  std::vector<molecule_bond>* mol_bond;
+  mol_bond = working->loadmolecules();
+  simulation worksim = simulation(mol_bond);
+  if (choice == 1) {
+    worksim.calculate_deuterium_order_parameter();
+  }
+  if (choice == 2) {
+    worksim.calculate_first_and_second_legendre();
+  }
+  if (choice == 3) {
+    worksim.calculate_deuterium_order_parameter();
+    worksim.calculate_first_and_second_legendre();
+  }
+
 }
