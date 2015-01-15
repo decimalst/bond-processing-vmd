@@ -76,15 +76,12 @@ int fileinput::find_atom_count() {
   }
   int number_of_molecules = 0;
   std::ifstream file;
-  file.open(
-      filename.c_str());
+  file.open(filename.c_str());
   std::string templine;
   for (int i = 0; i <= 1; i++) {
-    std::getline(
-        file, templine);
+    std::getline(file, templine);
     if (i == 0) {
-      number_of_molecules = atoi(
-          templine.c_str());
+      number_of_molecules = atoi(templine.c_str());
     }
   }
   lines_per_frame = number_of_molecules + 2;
@@ -92,8 +89,7 @@ int fileinput::find_atom_count() {
 }
 
 void fileinput::is_file_valid() {
-  if (filename.find(
-      xyz_extension, 0) != std::string::npos) {
+  if (filename.find(xyz_extension, 0) != std::string::npos) {
     std::cout << "file is valid" << std::endl;
     isvalidfile = true;
   } else {
@@ -106,12 +102,10 @@ int fileinput::get_line_number() {
   if (!isvalidfile) {
     return 0;
   }
-  std::ifstream filetocount(
-      filename);
+  std::ifstream filetocount(filename);
   int i = 0;
   std::string line;
-  while (getline(
-      filetocount, line)) {
+  while (getline(filetocount, line)) {
     i++;
   }
   return i;
@@ -129,18 +123,17 @@ int fileinput::find_in_array(std::string check_this, std::string* array_in,
 std::vector<molecule_bond>* fileinput::loadmolecules() {
   int bonds_per_carbon = 0;
   int index_of_size = 0;
-  int lines_in_file;
   //now, from the lipid_name and molecule_name, call find_in_array in order to find the number of bonds per
   //carbon for this specific carbon under consideration
   //pass a pointer to the start of one of the arrays listed at top of the header file
   if (lipid_name == "dspc") {
-    index_of_size = find_in_array(
-        carbon_name, dspc_carbons_sn1_ptr, dspccarbonssn1size);
+    index_of_size = find_in_array(carbon_name, dspc_carbons_sn1_ptr,
+                                  dspccarbonssn1size);
     bonds_per_carbon = dopccarbonssn1bonds[index_of_size];
   }
   if (lipid_name == "dopc") {
-    index_of_size = find_in_array(
-        carbon_name, dopc_carbons_sn1_ptr, dopccarbonssn1size);
+    index_of_size = find_in_array(carbon_name, dopc_carbons_sn1_ptr,
+                                  dopccarbonssn1size);
     bonds_per_carbon = dopccarbonssn1bonds[index_of_size];
   }
 //TODO: Add sn1,sn2 chains for popc
@@ -149,13 +142,13 @@ std::vector<molecule_bond>* fileinput::loadmolecules() {
 //
 //  }
   if (lipid_name == "dppc") {
-    index_of_size = find_in_array(
-        carbon_name, dppc_carbons_sn1_ptr, dppccarbonssn1size);
+    index_of_size = find_in_array(carbon_name, dppc_carbons_sn1_ptr,
+                                  dppccarbonssn1size);
     bonds_per_carbon = dppccarbonssn1bonds[index_of_size];
 
   }
-  if (lipid_name =="debug"){
-    bonds_per_carbon=2;
+  if (lipid_name == "debug") {
+    bonds_per_carbon = 2;
   }
 //Reads through .xyz file one line at a time, for each molecule, creates a trajectory for each C-H bond
 //Control loop variables
@@ -167,8 +160,7 @@ std::vector<molecule_bond>* fileinput::loadmolecules() {
 
   int atoms_per_frame = find_atom_count();
 //Variables needed for file IO
-  std::ifstream filetoload(
-      filename);
+  std::ifstream filetoload(filename);
   std::string templine;
 
 //This holds the bonds that we load from the file
@@ -197,48 +189,40 @@ std::vector<molecule_bond>* fileinput::loadmolecules() {
 //For each bond in the frame, instantiate it and add it to the bondholder vector
   for (int i = 0; i < number_of_bonds; i++) {
     bondholder->push_back(
-        molecule_bond(
-            carbon_name, lipid_name, bonds_per_carbon, new trajectory()));
+        molecule_bond(carbon_name, lipid_name, bonds_per_carbon,
+                      new trajectory()));
   }
-  std::cout << "bondhold size " << bondholder->size() << std::endl;
 //For each line in the frame, get it, and store its value in templine
-  while (std::getline(
-      filetoload, templine)) {
-    current_frame = floor(
-        current_line_absolute / (atoms_per_frame + 2));
+  while (std::getline(filetoload, templine)) {
+    current_frame = floor(current_line_absolute / (atoms_per_frame + 2));
     current_line_in_frame = current_line_absolute % (atoms_per_frame + 2);
     current_line_absolute++;
-//    std::cout <<"bond_holder_index "<< bond_holder_index << std::endl;
+//    std::cout << "bond_holder_index " << bond_holder_index << std::endl;
 //    std::cout << "current_line_in_frame " << current_line_in_frame
 //              << " current_frame " << current_frame
 //              << " current_line_absolute  " << current_line_absolute
 //              << std::endl;
-    //   std::cout <<"current_frame"<< current_frame << std::endl;
+//    std::cout << "current_frame" << current_frame << std::endl;
 //    std::cout << "per_line_count " << per_line_count << std::endl;
-//    std::cout <<"current_line_absolute "<<current_line_absolute<<std::endl;
+//    std::cout << "current_line_absolute " << current_line_absolute << std::endl;
     //The first two lines of each frame will be the number of atoms, and the comment line
     //so we can disregard them
     if (current_line_in_frame > 1) {
       //Break the loaded line into a string stream for parsing
-      std::stringstream iss(
-          templine);
+      std::stringstream iss(templine);
       iss >> identifier_holder >> temp_x >> temp_y >> temp_z;
       //Using the control variable "per_line_count" we know where to store the data
       if (per_line_count == 0 && per_line_count <= bonds_per_carbon) {
-        temp_carbon = coords_3d(
-            temp_x, temp_y, temp_z);
+        temp_carbon = coords_3d(temp_x, temp_y, temp_z);
       }
       if (per_line_count == 1 && per_line_count <= bonds_per_carbon) {
-        temp_hydrogen1 = coords_3d(
-            temp_x, temp_y, temp_z);
+        temp_hydrogen1 = coords_3d(temp_x, temp_y, temp_z);
       }
       if (per_line_count == 2 && per_line_count <= bonds_per_carbon) {
-        temp_hydrogen2 = coords_3d(
-            temp_x, temp_y, temp_z);
+        temp_hydrogen2 = coords_3d(temp_x, temp_y, temp_z);
       }
       if (per_line_count == 3 && per_line_count <= bonds_per_carbon) {
-        temp_hydrogen3 = coords_3d(
-            temp_x, temp_y, temp_z);
+        temp_hydrogen3 = coords_3d(temp_x, temp_y, temp_z);
       }
       //If we've loaded all the hydrogen coords associated with the first carbon
       //We can now calculate the unit vector from the coords and store it in the trajectory
@@ -248,61 +232,42 @@ std::vector<molecule_bond>* fileinput::loadmolecules() {
         //Add the vector_3ds to the trajectory of the molecular bond it belongs to
         //with the same index.
         if (bonds_per_carbon == 1) {
-          temp_bond1 = vector_3d(
-              temp_carbon, temp_hydrogen1);
-          temp_mol_bond1 = bondholder->at(
-              bond_holder_index);
+          temp_bond1 = vector_3d(temp_carbon, temp_hydrogen1);
+
+          temp_mol_bond1 = bondholder->at(bond_holder_index);
           temp_mol_bond1.getMoleculeTrajectory()->get_trajectory_array()
-              ->push_back(
-              temp_bond1);
+              ->push_back(temp_bond1);
           bond_holder_index++;
         }
         if (bonds_per_carbon == 2) {
-          temp_bond1 = vector_3d(
-              temp_carbon, temp_hydrogen1);
-          temp_bond2 = vector_3d(
-              temp_carbon, temp_hydrogen2);
-          temp_mol_bond1 = bondholder->at(
-              bond_holder_index);
+          temp_bond1 = vector_3d(temp_carbon, temp_hydrogen1);
+          temp_bond2 = vector_3d(temp_carbon, temp_hydrogen2);
+          temp_mol_bond1 = bondholder->at(bond_holder_index);
           temp_mol_bond1.getMoleculeTrajectory()->get_trajectory_array()
-              ->push_back(
-              temp_bond1);
+              ->push_back(temp_bond1);
           bond_holder_index++;
-          temp_mol_bond2 = bondholder->at(
-              bond_holder_index);
+          temp_mol_bond2 = bondholder->at(bond_holder_index);
           temp_mol_bond2.getMoleculeTrajectory()->get_trajectory_array()
-              ->push_back(
-              temp_bond2);
+              ->push_back(temp_bond2);
           bond_holder_index++;
         }
         if (bonds_per_carbon == 3) {
-          temp_bond1 = vector_3d(
-              temp_carbon, temp_hydrogen1);
-          temp_bond2 = vector_3d(
-              temp_carbon, temp_hydrogen2);
-          temp_bond3 = vector_3d(
-              temp_carbon, temp_hydrogen3);
-          temp_bond1 = vector_3d(
-              temp_carbon, temp_hydrogen1);
-          temp_bond2 = vector_3d(
-              temp_carbon, temp_hydrogen2);
-          temp_mol_bond1 = bondholder->at(
-              bond_holder_index);
+          temp_bond1 = vector_3d(temp_carbon, temp_hydrogen1);
+          temp_bond2 = vector_3d(temp_carbon, temp_hydrogen2);
+          temp_bond3 = vector_3d(temp_carbon, temp_hydrogen3);
+          temp_bond1 = vector_3d(temp_carbon, temp_hydrogen1);
+          temp_bond2 = vector_3d(temp_carbon, temp_hydrogen2);
+          temp_mol_bond1 = bondholder->at(bond_holder_index);
           temp_mol_bond1.getMoleculeTrajectory()->get_trajectory_array()
-              ->push_back(
-              temp_bond1);
+              ->push_back(temp_bond1);
           bond_holder_index++;
-          temp_mol_bond2 = bondholder->at(
-              bond_holder_index);
+          temp_mol_bond2 = bondholder->at(bond_holder_index);
           temp_mol_bond2.getMoleculeTrajectory()->get_trajectory_array()
-              ->push_back(
-              temp_bond2);
+              ->push_back(temp_bond2);
           bond_holder_index++;
-          temp_mol_bond3 = bondholder->at(
-              bond_holder_index);
+          temp_mol_bond3 = bondholder->at(bond_holder_index);
           temp_mol_bond3.getMoleculeTrajectory()->get_trajectory_array()
-              ->push_back(
-              temp_bond3);
+              ->push_back(temp_bond3);
           bond_holder_index++;
         }
       }
@@ -317,6 +282,16 @@ std::vector<molecule_bond>* fileinput::loadmolecules() {
     }
     //Repeat per frame
   }
+//  for (int i = 0; i < 100; i++) {
+//    temp_mol_bond3 = bondholder->at(0);
+//    std::cout << "x= "
+//        << temp_mol_bond3.getMoleculeTrajectory()->get_trajectory_array()->at(i)
+//            .get_x()
+//        << temp_mol_bond3.getMoleculeTrajectory()->get_trajectory_array()->at(i)
+//            .get_y()
+//        << temp_mol_bond3.getMoleculeTrajectory()->get_trajectory_array()->at(i)
+//            .get_z() << std::endl;
+//  }
   return bondholder;
 }
 

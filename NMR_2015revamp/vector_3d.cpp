@@ -27,7 +27,7 @@ void vector_3d::set_z(double input){
 
 double vector_3d::get_dot_product(vector_3d* input){
   //Dot product is = x1*x2 + y1*y2 + z1*z2
-  return (get_x() * input->get_x()) + get_y() * input->get_y() + get_z() * input->get_z();
+  return (get_x() * input->get_x()) + (get_y() * input->get_y()) + (get_z() * input->get_z());
 }
 
 double vector_3d::get_magnitude(){
@@ -46,9 +46,9 @@ vector_3d::vector_3d(double x, double y, double z){
   z_coord=z;
 }
 vector_3d::vector_3d(){
-  x_coord=0.01;
-  y_coord=0.01;
-  z_coord=0.01;
+  x_coord=0.00;
+  y_coord=0.00;
+  z_coord=0.00;
 }
 vector_3d::vector_3d(coords_3d source, coords_3d dest){
   double temp_x;

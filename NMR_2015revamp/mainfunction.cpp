@@ -80,7 +80,9 @@ int fileinput_test() {
 //      << std::endl;
 //  for (int i=0; i<152; i++){
 //    std::cout << i << " "
-//          << test_mol_bond.at(i).getMoleculeTrajectory()->get_trajectory_array()->size()
+//          << test_mol_bond.at(0).getMoleculeTrajectory()->get_trajectory_array()->at(i).get_x()
+//          << " " << test_mol_bond.at(0).getMoleculeTrajectory()->get_trajectory_array()->at(i).get_y()
+//          << " " << test_mol_bond.at(0).getMoleculeTrajectory()->get_trajectory_array()->at(i).get_z()
 //          << std::endl;
 //  }
   return 1;
@@ -116,7 +118,7 @@ void debug_test() {
 int main(void) {
 //  coords_3d_test();
 //  vector_3d_test();
-//  fileinput_test();
+// fileinput_test();
 // simulation_test();
 //  debug_test();
   int choice;
