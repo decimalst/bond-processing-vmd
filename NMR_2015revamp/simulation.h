@@ -23,7 +23,7 @@ class simulation{
   void set_number_of_frames(int);
   int get_number_of_molecules();
   void calculate_deuterium_order_parameter();
-  void calculate_first_legendre();
+  void perl_formatter();
   void calculate_second_legendre();
   void calculate_first_and_second_legendre();
   simulation();

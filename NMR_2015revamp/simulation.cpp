@@ -29,7 +29,7 @@ simulation::simulation(std::vector<molecule_bond>* molecules_in) {
   frame_time_value = 0.0;
   number_of_frames = molecules_in->at(1).getMoleculeTrajectory()
       ->get_trajectory_array()->size();
-  for (int i = 0; i < molecules_in->size(); i++) {
+  for (unsigned int i = 0; i < molecules_in->size(); i++) {
     molecules->at(i).getMoleculeTrajectory()->set_number_of_frames(
         number_of_frames);
   }
@@ -84,31 +84,71 @@ void simulation::calculate_deuterium_order_parameter() {
   std::cout << average_over_ensemble << std::endl;
 
 }
-void simulation::calculate_first_legendre() {
-//Calculates first legendre polynomial and writes it to a text file
+void simulation::perl_formatter() {
+//Formats data for perl script
+  //Calculates first and second legendre polynomials
+  int number_of_bonds = number_of_molecules;
+  ;
+  int bonds_per_carbon = get_molecules()->at(0).getNumberOfBonds();
+  int number_of_frames = get_number_of_frames();
+  vector_3d vector1, vector2;
+
+  std::string filename;
+  filename = molecules->at(0).getName() + "_"
+      + molecules->at(0).getMoleculeType() + "_perlformatted";
+  std::ofstream write_to_file(filename);
+  write_to_file.precision(10);
+  std::cout.precision(10);
+  for (int frame = 0; frame < number_of_frames; frame++) {
+    write_to_file << "frame " << frame << std::endl;
+    for (int bond = 0; bond < number_of_bonds; bond += bonds_per_carbon) {
+      //std::cout << bond % bonds_per_carbon << std::endl;
+      if (bonds_per_carbon == 1) {
+        //then it's right bond
+        vector1 = molecules->at(bond).getMoleculeTrajectory()
+            ->get_trajectory_array()->at(frame);
+      }
+      if (bonds_per_carbon == 2) {
+        //then it's a left bond
+        vector1 = molecules->at(bond).getMoleculeTrajectory()
+            ->get_trajectory_array()->at(frame);
+        write_to_file << bond/(bonds_per_carbon) << " " << vector1.get_x() << " " << vector1.get_y() << " " << vector1.get_z();
+        vector1 = molecules->at(bond+1).getMoleculeTrajectory()
+            ->get_trajectory_array()->at(frame);
+        write_to_file << " " << vector1.get_x() << " " << vector1.get_y() << " " << vector1.get_z() << std::endl;
+
+      }
+      if (bonds_per_carbon == 3) {
+        //then it's a left bond
+        vector1 = molecules->at(bond).getMoleculeTrajectory()
+            ->get_trajectory_array()->at(frame);
+
+        vector1 = molecules->at(bond + 1).getMoleculeTrajectory()
+            ->get_trajectory_array()->at(frame);
+
+        vector1 = molecules->at(bond + 2).getMoleculeTrajectory()
+            ->get_trajectory_array()->at(frame);
+      }
+    }
+
+  }
 
 }
 void simulation::calculate_second_legendre() {
 //Calculates second legendre polynomial and writes it to a text file
-
 }
 void simulation::calculate_first_and_second_legendre() {
-//Calculates both first and second legendre polynomials and write them both to a textfile
-//Given "m" molecular bonds, and "n" frames
-//First, declare float values to use as sums
-//First legendre sums
-  int number_of_frames = get_number_of_frames();
+//Calculates first and second legendre polynomials
+  int number_of_bonds = number_of_molecules;
+  ;
   int bonds_per_carbon = get_molecules()->at(0).getNumberOfBonds();
-  std::cout << "bonds per carbon " << bonds_per_carbon << std::endl;
-  int count = 0;
+  int number_of_frames = get_number_of_frames();
+  double x1, y1, z1, xx1, yy1, zz1, xy1, xz1, yz1;
+  double x2, y2, z2, xx2, yy2, zz2, xy2, xz2, yz2;
+  double x_all, y_all, z_all, xx_all, yy_all, zz_all, xy_all, xz_all, yz_all;
+  double p1_sum = 0.0, p2_sum = 0.0;
+  vector_3d vector1, vector2;
 
-  double x0xt_sum = 0.0, y0yt_sum = 0.0, z0zt_sum = 0.0;
-  //Second legendre sums for left
-  double x0xt_squared_sum = 0.0, y0yt_squared_sum = 0.0, z0zt_squared_sum = 0.0;
-  double x0y0xtyt_sum = 0.0, x0z0xtzt_sum = 0.0, y0z0ytzt_sum = 0.0;
-  double p1 = 0.0, p2 = 0.0;
-
-  //String operations to make output filename
   std::string filename;
   filename = molecules->at(0).getName() + "_"
       + molecules->at(0).getMoleculeType() + "_legendre";
@@ -120,254 +160,136 @@ void simulation::calculate_first_and_second_legendre() {
                 << "<x(0)y(0)x(t)y(t)>" << " " << "<x(0)z(0)x(t)z(t)>" << " "
                 << "<y(0)z(0)y(t)z(t)>" << " " << "C1" << " " << "C2"
                 << std::endl;
-
-  //Then, declare arrays for the output results vs t
-  std::vector<double> first_x1(number_of_molecules), first_y1(
-      number_of_molecules), first_z1(number_of_molecules);
-  std::vector<double> second_xsquare1(number_of_molecules), second_ysquare1(
-      number_of_molecules), second_zsquare1(number_of_molecules);
-  std::vector<double> second_xy1(number_of_molecules), second_xz1(
-      number_of_molecules), second_yz1(number_of_molecules);
-  std::vector<int> spacing_array;
-
-  std::vector<double> first_x2(number_of_molecules), first_y2(
-      number_of_molecules), first_z2(number_of_molecules);
-  std::vector<double> second_xsquare2(number_of_molecules), second_ysquare2(
-      number_of_molecules), second_zsquare2(number_of_molecules);
-  std::vector<double> second_xy2(number_of_molecules), second_xz2(
-      number_of_molecules), second_yz2(number_of_molecules);
-
-  std::vector<double> first_x3(number_of_molecules), first_y3(
-      number_of_molecules), first_z3(number_of_molecules);
-  std::vector<double> second_xsquare3(number_of_molecules), second_ysquare3(
-      number_of_molecules), second_zsquare3(number_of_molecules);
-  std::vector<double> second_xy3(number_of_molecules), second_xz3(
-      number_of_molecules), second_yz3(number_of_molecules);
-
-  //Temp vectors to hold vectors we select
-  vector_3d vector1, vector2;
-
+  write_to_file.precision(10);
+  std::cout.precision(10);
   for (int spacing = 0; spacing < number_of_frames; spacing++) {
-    x0xt_sum = 0.0;
-    y0yt_sum = 0.0;
-    z0zt_sum = 0.0;
-    x0xt_squared_sum = 0.0;
-    y0yt_squared_sum = 0.0;
-    z0zt_squared_sum = 0.0;
-    x0y0xtyt_sum = 0.0;
-    x0z0xtzt_sum = 0.0;
-    y0z0ytzt_sum = 0.0;
     std::cout << "spacing= " << spacing << " out of " << number_of_frames
               << std::endl;
-    for (int i = 0; i < number_of_molecules; i = i + bonds_per_carbon) {
-//      std::cout << "i = " << i << " i+1= "<< i+1 << std::endl;
-      count = 0;
-//      vector1 =
-//          molecules->at(i).getMoleculeTrajectory()->get_trajectory_array()->at(
-//              0);
-//      vector2 =
-//          molecules->at(i+1).getMoleculeTrajectory()->get_trajectory_array()->at(
-//              0);
-//      std::cout << "x " << vector1.get_x() << " y " << vector1.get_y() << " z " << vector1.get_z() << std::endl;
-//      std::cout << "x " << vector2.get_x() << " y " << vector2.get_y() << " z " << vector2.get_z() << std::endl;
-      for (int i = 0; i < number_of_molecules; i++) {
-        first_x1[i] = 0.0;
-        first_y1[i] = 0.0;
-        first_z1[i] = 0.0;
-        second_xsquare1[i] = 0.0;
-        second_ysquare1[i] = 0.0;
-        second_zsquare1[i] = 0.0;
-        second_xy1[i] = 0.0;
-        second_xz1[i] = 0.0;
-        second_yz1[i] = 0.0;
-        first_x2[i] = 0.0;
-        first_y2[i] = 0.0;
-        first_z2[i] = 0.0;
-        second_xsquare2[i] = 0.0;
-        second_ysquare2[i] = 0.0;
-        second_zsquare2[i] = 0.0;
-        second_xy2[i] = 0.0;
-        second_xz2[i] = 0.0;
-        second_yz2[i] = 0.0;
-        first_x3[i] = 0.0;
-        first_y3[i] = 0.0;
-        first_z3[i] = 0.0;
-        second_xsquare3[i] = 0.0;
-        second_ysquare3[i] = 0.0;
-        second_zsquare3[i] = 0.0;
-        second_xy3[i] = 0.0;
-        second_xz3[i] = 0.0;
-        second_yz3[i] = 0.0;
-      }
-
-      for (int j = 0; j < number_of_frames - spacing; j++) {
-        count++;
-
-        if (bonds_per_carbon == 1) {
-          vector1 = molecules->at(i).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j);
-          vector2 = molecules->at(i).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j + spacing);
-          first_x1[i] += vector1.get_x() * vector2.get_x();
-          first_y1[i] += vector1.get_y() * vector2.get_y();
-          first_z1[i] += vector1.get_z() * vector2.get_z();
-          second_xsquare1[i] += vector1.get_x() * vector2.get_x()
-              * vector1.get_x() * vector2.get_x();
-          second_ysquare1[i] += vector1.get_y() * vector2.get_y()
-              * vector1.get_y() * vector2.get_y();
-          second_zsquare1[i] += vector1.get_z() * vector2.get_z()
-              * vector1.get_z() * vector2.get_z();
-          second_xy1[i] += vector1.get_x() * vector1.get_y() * vector2.get_x()
+    x_all = 0.0;
+    y_all = 0.0;
+    z_all = 0.0;
+    xx_all = 0.0;
+    yy_all = 0.0;
+    zz_all = 0.0;
+    xy_all = 0.0;
+    xz_all = 0.0;
+    yz_all = 0.0;
+    for (int bond = 0; bond < number_of_bonds; bond++) {
+      x1 = 0.0;
+      x2 = 0.0;
+      y1 = 0.0;
+      y2 = 0.0;
+      z1 = 0.0;
+      z2 = 0.0;
+      xx1 = 0.0;
+      yy1 = 0.0;
+      zz1 = 0.0;
+      xy1 = 0.0;
+      xz1 = 0.0;
+      yz1 = 0.0;
+      xx2 = 0.0;
+      yy2 = 0.0;
+      zz2 = 0.0;
+      xy2 = 0.0;
+      xz2 = 0.0;
+      yz2 = 0.0;
+      for (int frame = 0; frame < (number_of_frames - spacing); frame++) {
+        //std::cout << bond % bonds_per_carbon << std::endl;
+        if (bond % bonds_per_carbon == 0) {
+          //then it's right bond
+          vector1 = molecules->at(bond).getMoleculeTrajectory()
+              ->get_trajectory_array()->at(frame);
+          vector2 = molecules->at(bond).getMoleculeTrajectory()
+              ->get_trajectory_array()->at(frame + spacing);
+          x1 += vector1.get_x() * vector2.get_x();
+          //std::cout << "x1 "<< x1 << std::endl;
+          y1 += vector1.get_y() * vector2.get_y();
+          z1 += vector1.get_z() * vector2.get_z();
+          xx1 += pow(vector1.get_x(), 2) * pow(vector2.get_x(), 2);
+          yy1 += pow(vector1.get_y(), 2) * pow(vector2.get_y(), 2);
+          zz1 += pow(vector1.get_z(), 2) * pow(vector2.get_z(), 2);
+          xy1 += vector1.get_x() * vector1.get_y() * vector2.get_x()
               * vector2.get_y();
-          second_xz1[i] += vector1.get_x() * vector1.get_z() * vector2.get_x()
+          xz1 += vector1.get_x() * vector1.get_z() * vector2.get_x()
               * vector2.get_z();
-          second_yz1[i] += vector1.get_z() * vector1.get_y() * vector2.get_z()
-              * vector2.get_y();
+          yz1 += vector1.get_y() * vector1.get_z() * vector2.get_y()
+              * vector2.get_z();
         }
-        if (bonds_per_carbon == 2) {
-          vector1 = molecules->at(i).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j);
-          vector2 = molecules->at(i).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j + spacing);
-          first_x1[i] += vector1.get_x() * vector2.get_x();
-          first_y1[i] += vector1.get_y() * vector2.get_y();
-          first_z1[i] += vector1.get_z() * vector2.get_z();
-          second_xsquare1[i] += vector1.get_x() * vector2.get_x()
-              * vector1.get_x() * vector2.get_x();
-          second_ysquare1[i] += vector1.get_y() * vector2.get_y()
-              * vector1.get_y() * vector2.get_y();
-          second_zsquare1[i] += vector1.get_z() * vector2.get_z()
-              * vector1.get_z() * vector2.get_z();
-          second_xy1[i] += vector1.get_x() * vector1.get_y() * vector2.get_x()
+        if (bond % bonds_per_carbon == 1) {
+          //then it's a left bond
+          vector1 = molecules->at(bond).getMoleculeTrajectory()
+              ->get_trajectory_array()->at(frame);
+          vector2 = molecules->at(bond).getMoleculeTrajectory()
+              ->get_trajectory_array()->at(frame + spacing);
+          x2 += vector1.get_x() * vector2.get_x();
+          y2 += vector1.get_y() * vector2.get_y();
+          z2 += vector1.get_z() * vector2.get_z();
+          xx2 += pow(vector1.get_x(), 2) * pow(vector2.get_x(), 2);
+          yy2 += pow(vector1.get_y(), 2) * pow(vector2.get_y(), 2);
+          zz2 += pow(vector1.get_z(), 2) * pow(vector2.get_z(), 2);
+          xy2 += vector1.get_x() * vector1.get_y() * vector2.get_x()
               * vector2.get_y();
-          second_xz1[i] += vector1.get_x() * vector1.get_z() * vector2.get_x()
+          xz2 += vector1.get_x() * vector1.get_z() * vector2.get_x()
               * vector2.get_z();
-          second_yz1[i] += vector1.get_z() * vector1.get_y() * vector2.get_z()
-              * vector2.get_y();
-          vector1 = molecules->at(i + 1).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j);
-          vector2 = molecules->at(i + 1).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j + spacing);
-          first_x2[i] += vector1.get_x() * vector2.get_x();
-          first_y2[i] += vector1.get_y() * vector2.get_y();
-          first_z2[i] += vector1.get_z() * vector2.get_z();
-          second_xsquare2[i] += vector1.get_x() * vector2.get_x()
-              * vector1.get_x() * vector2.get_x();
-          second_ysquare2[i] += vector1.get_y() * vector2.get_y()
-              * vector1.get_y() * vector2.get_y();
-          second_zsquare2[i] += vector1.get_z() * vector2.get_z()
-              * vector1.get_z() * vector2.get_z();
-          second_xy2[i] += vector1.get_x() * vector1.get_y() * vector2.get_x()
-              * vector2.get_y();
-          second_xz2[i] += vector1.get_x() * vector1.get_z() * vector2.get_x()
+          yz2 += vector1.get_y() * vector1.get_z() * vector2.get_y()
               * vector2.get_z();
-          second_yz2[i] += vector1.get_z() * vector1.get_y() * vector2.get_z()
-              * vector2.get_y();
-        }
-        if (bonds_per_carbon == 3) {
-          vector1 = molecules->at(i).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j);
-          vector2 = molecules->at(i).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j + spacing);
-          first_x1[i] = vector1.get_x() * vector2.get_x();
-          first_y1[i] = vector1.get_y() * vector2.get_y();
-          first_z1[i] = vector1.get_z() * vector2.get_z();
-          second_xsquare1[i] = vector1.get_x() * vector2.get_x()
-              * vector1.get_x() * vector2.get_x();
-          second_ysquare1[i] = vector1.get_y() * vector2.get_y()
-              * vector1.get_y() * vector2.get_y();
-          second_zsquare1[i] = vector1.get_z() * vector2.get_z()
-              * vector1.get_z() * vector2.get_z();
-          second_xy1[i] = vector1.get_x() * vector1.get_y() * vector2.get_x()
-              * vector2.get_y();
-          second_xz1[i] = vector1.get_x() * vector1.get_z() * vector2.get_x()
-              * vector2.get_z();
-          second_yz1[i] = vector1.get_z() * vector1.get_y() * vector2.get_z()
-              * vector2.get_y();
-          vector1 = molecules->at(i + 1).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j);
-          vector2 = molecules->at(i + 1).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j + spacing);
-          first_x2[i] = vector1.get_x() * vector2.get_x();
-          first_y2[i] = vector1.get_y() * vector2.get_y();
-          first_z2[i] = vector1.get_z() * vector2.get_z();
-          second_xsquare2[i] = vector1.get_x() * vector2.get_x()
-              * vector1.get_x() * vector2.get_x();
-          second_ysquare2[i] = vector1.get_y() * vector2.get_y()
-              * vector1.get_y() * vector2.get_y();
-          second_zsquare2[i] = vector1.get_z() * vector2.get_z()
-              * vector1.get_z() * vector2.get_z();
-          second_xy2[i] = vector1.get_x() * vector1.get_y() * vector2.get_x()
-              * vector2.get_y();
-          second_xz2[i] = vector1.get_x() * vector1.get_z() * vector2.get_x()
-              * vector2.get_z();
-          second_yz2[i] = vector1.get_z() * vector1.get_y() * vector2.get_z()
-              * vector2.get_y();
-          vector1 = molecules->at(i + 2).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j);
-          vector2 = molecules->at(i + 2).getMoleculeTrajectory()
-              ->get_trajectory_array()->at(j + spacing);
-          first_x3[i] = vector1.get_x() * vector2.get_x();
-          first_y3[i] = vector1.get_y() * vector2.get_y();
-          first_z3[i] = vector1.get_z() * vector2.get_z();
-          second_xsquare3[i] = vector1.get_x() * vector2.get_x()
-              * vector1.get_x() * vector2.get_x();
-          second_ysquare3[i] = vector1.get_y() * vector2.get_y()
-              * vector1.get_y() * vector2.get_y();
-          second_zsquare3[i] = vector1.get_z() * vector2.get_z()
-              * vector1.get_z() * vector2.get_z();
-          second_xy3[i] = vector1.get_x() * vector1.get_y() * vector2.get_x()
-              * vector2.get_y();
-          second_xz3[i] = vector1.get_x() * vector1.get_z() * vector2.get_x()
-              * vector2.get_z();
-          second_yz3[i] = vector1.get_z() * vector1.get_y() * vector2.get_z()
-              * vector2.get_y();
         }
       }
-      x0xt_sum += (first_x1[i] / (double) count)
-          + (first_x2[i] / (double) count) + (first_x3[i] / (double) count);
-      y0yt_sum += (first_y1[i] / (double) count)
-          + (first_y2[i] / (double) count) + (first_y3[i] / (double) count);
-      z0zt_sum += (first_z1[i] / (double) count)
-          + (first_z2[i] / (double) count) + (first_z3[i] / (double) count);
-      x0xt_squared_sum += (second_xsquare1[i] / (double) count)
-          + (second_xsquare2[i] / (double) count)
-          + (second_xsquare3[i] / (double) count);
-      y0yt_squared_sum += (second_ysquare1[i] / (double) count)
-          + (second_ysquare2[i] / (double) count)
-          + (second_ysquare3[i] / (double) count);
-      z0zt_squared_sum += (second_zsquare1[i] / (double) count)
-          + (second_zsquare2[i] / (double) count)
-          + (second_zsquare3[i] / (double) count);
-      x0y0xtyt_sum += (second_xy1[i] / (double) count)
-          + (second_xy2[i] / (double) count) + (second_xy3[i] / (double) count);
-      x0z0xtzt_sum += (second_xz1[i] / (double) count)
-          + (second_xz2[i] / (double) count) + (second_xz3[i] / (double) count);
-      y0z0ytzt_sum += (second_yz1[i] / (double) count)
-          + (second_yz2[i] / (double) count) + (second_yz3[i] / (double) count);
+      x1 = x1 * (1.0 / (number_of_frames - spacing));
+      x2 = x2 * (1.0 / (number_of_frames - spacing));
+      y1 = y1 * (1.0 / (number_of_frames - spacing));
+      y2 = y2 * (1.0 / (number_of_frames - spacing));
+      z1 = z1 * (1.0 / (number_of_frames - spacing));
+      z2 = z2 * (1.0 / (number_of_frames - spacing));
+      xx1 = xx1 * (1.0 / (number_of_frames - spacing));
+      yy1 = yy1 * (1.0 / (number_of_frames - spacing));
+      zz1 = zz1 * (1.0 / (number_of_frames - spacing));
+      xy1 = xy1 * (1.0 / (number_of_frames - spacing));
+      xz1 = xz1 * (1.0 / (number_of_frames - spacing));
+      yz1 = yz1 * (1.0 / (number_of_frames - spacing));
+      xx2 = xx2 * (1.0 / (number_of_frames - spacing));
+      yy2 = yy2 * (1.0 / (number_of_frames - spacing));
+      zz2 = zz2 * (1.0 / (number_of_frames - spacing));
+      xy2 = xy2 * (1.0 / (number_of_frames - spacing));
+      xz2 = xz2 * (1.0 / (number_of_frames - spacing));
+      yz2 = yz2 * (1.0 / (number_of_frames - spacing));
+      p1_sum += (x1 + x2) + (y1 + y1) + (z1 + z2);
+      p2_sum += (3
+          * (xx1 + xx2 + yy1 + yy2 + zz1 + zz2 + 2 * (xy1 + xy2)
+              + 2 * (xz1 + xz2) + 2 * (yz1 + yz2)) - 1) / 2;
+      x_all += x1 + x2;
+      y_all += y1 + y2;
+      z_all += z1 + z2;
+      xx_all += xx1 + xx2;
+      yy_all += yy1 + yy2;
+      zz_all += zz1 + zz2;
+      xy_all += xy1 + xy2;
+      xz_all += xz1 + xz2;
+      yz_all += yz1 + yz2;
     }
-    x0xt_sum = x0xt_sum / (number_of_molecules / bonds_per_carbon) * 0.5;
-    y0yt_sum = y0yt_sum / (number_of_molecules / bonds_per_carbon) * 0.5;
-    z0zt_sum = z0zt_sum / (number_of_molecules / bonds_per_carbon) * 0.5;
-    x0xt_squared_sum = x0xt_squared_sum
-        / (number_of_molecules / bonds_per_carbon) * 0.5;
-    y0yt_squared_sum = y0yt_squared_sum
-        / (number_of_molecules / bonds_per_carbon) * 0.5;
-    z0zt_squared_sum = z0zt_squared_sum
-        / (number_of_molecules / bonds_per_carbon) * 0.5;
-    x0y0xtyt_sum = x0y0xtyt_sum / (number_of_molecules / bonds_per_carbon) * 0.5;
-    x0z0xtzt_sum = x0z0xtzt_sum / (number_of_molecules / bonds_per_carbon) * 0.5;
-    y0z0ytzt_sum = y0z0ytzt_sum / (number_of_molecules / bonds_per_carbon) * 0.5;
-    p1 = x0xt_sum + y0yt_sum + z0zt_sum;
-    p2 = 1.5
-        * (x0xt_squared_sum + y0yt_squared_sum + z0zt_squared_sum
-            + 2.0 * x0y0xtyt_sum + 2.0 * x0z0xtzt_sum + 2.0 * y0z0ytzt_sum)
-        - 0.5;
-    write_to_file << spacing << " " << x0xt_sum << " " << y0yt_sum << " "
-                  << z0zt_sum << " " << x0xt_squared_sum << " "
-                  << y0yt_squared_sum << " " << z0zt_squared_sum << " "
-                  << x0y0xtyt_sum << " " << x0z0xtzt_sum << " " << y0z0ytzt_sum
-                  << " " << p1 << " " << p2 << std::endl;
+    x_all = x_all * (1.0 / number_of_molecules);
+    y_all = y_all * (1.0 / number_of_molecules);
+    z_all = z_all * (1.0 / number_of_molecules);
+    xx_all = xx_all * (1.0 / number_of_molecules);
+    yy_all = yy_all * (1.0 / number_of_molecules);
+    zz_all = zz_all * (1.0 / number_of_molecules);
+    xy_all = xy_all * (1.0 / number_of_molecules);
+    xz_all = xz_all * (1.0 / number_of_molecules);
+    yz_all = yz_all * (1.0 / number_of_molecules);
+    p1_sum = x_all + y_all + z_all;
+    p2_sum = p2_sum * (1.0 / (number_of_molecules));
+//    std::cout
+//        << "p2_sum "
+//        << p2_sum
+//        << " vs "
+//        << (3
+//            * (xx_all + yy_all + zz_all + 2 * (xy_all) + 2 * (xz_all)
+//                + 2 * (yz_all)) - 1) / 2;
+
+    write_to_file << spacing << " " << x_all << " " << y_all << " " << z_all
+                  << " " << xx_all << " " << yy_all << " " << zz_all << " "
+                  << xy_all << " " << xz_all << " " << yz_all << " " << p1_sum
+                  << " " << p2_sum << std::endl;
   }
 
 }

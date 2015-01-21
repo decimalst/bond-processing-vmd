@@ -88,7 +88,7 @@ int fileinput_test() {
   return 1;
 }
 int simulation_test() {
-  fileinput* test_file = new fileinput("DOPC-C27.xyz", "C27", "dopc");
+  fileinput* test_file = new fileinput("DOPC-C22.xyz", "C22", "dopc");
   std::vector<molecule_bond>* test_mol_bond;
   test_mol_bond = test_file->loadmolecules();
   simulation * newsim;
@@ -137,12 +137,12 @@ int main(void) {
   std::cout << "You have selected " << lipidname << " carbon: " << carbonname
             << " from file " << filename << std::endl;
   std::cout
-      << "Input 1 to calculate SCD parameter only, input 2 to calculate first and second Legendre polynomial only, input 3 to calculate both"
+      << "Input 1 to calculate SCD parameter only, input 2 to calculate first and second Legendre polynomial only, input 3 to calculate both, input 4 to perl format the bonds"
       << std::endl;
 
   std::cin >> inputchoice;
   choice=stoi(inputchoice);
-  if (choice == 1 || choice == 2 || choice == 3) {
+  if (choice == 1 || choice == 2 || choice == 3 || choice==4) {
     isvalid=true;
   }
   while (!isvalid) {
@@ -169,6 +169,9 @@ int main(void) {
   if (choice == 3) {
     worksim.calculate_deuterium_order_parameter();
     worksim.calculate_first_and_second_legendre();
+  }
+  if (choice ==4) {
+    worksim.perl_formatter();
   }
 
 }
