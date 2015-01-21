@@ -38,11 +38,11 @@ int dopccarbonssn2bonds[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3 };
 int dopccarbonssn2size = 17;
 std::string* dopc_carbons_sn2_ptr = &dopccarbonssn2[0];
 
-std::string dppccarbonssn1[] = { "C22", "C23", "C24", "C25", "C26", "C27",
+std::string dppccarbonssn1[] = { "C2", "C22", "C23", "C24", "C25", "C26", "C27",
     "C28", "C29", "C210", "C211", "C212", "C213", "C214", "C215", "C216" };
 int dppccarbonssn1bonds[] =
-    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3 };
-int dppccarbonssn1size = 15;
+    { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3 };
+int dppccarbonssn1size = 16;
 std::string* dppc_carbons_sn1_ptr = &dppccarbonssn1[0];
 
 std::string dppccarbonssn2[] = { "C32", "C33", "C34", "C35", "C36", "C37",
@@ -51,6 +51,12 @@ int dppccarbonssn2bonds[] =
     { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3 };
 int dppccarbonssn2size = 15;
 std::string* dppc_carbons_sn2_ptr = &dppccarbonssn2[0];
+std::string psmcarbons[] = { "C2" };
+int psmcarbonbonds[] =
+    { 1 };
+int psmcarbonssize = 1;
+std::string* psm_carbons_ptr = &psmcarbons[0];
+
 
 fileinput::fileinput(std::string file_name, std::string carbon_name_given,
                      std::string molecule_type) {
@@ -150,6 +156,10 @@ std::vector<molecule_bond>* fileinput::loadmolecules() {
   if (lipid_name == "debug") {
     bonds_per_carbon = 2;
   }
+  if (lipid_name == "psm"){
+    index_of_size= find_in_array(carbon_name, psm_carbons_ptr, psmcarbonssize);
+    bonds_per_carbon=psmcarbonbonds[index_of_size];
+  }
 //Reads through .xyz file one line at a time, for each molecule, creates a trajectory for each C-H bond
 //Control loop variables
   int current_frame = 0;
@@ -184,8 +194,8 @@ std::vector<molecule_bond>* fileinput::loadmolecules() {
   //us calculate how many bonds in each frame
   int number_of_bonds = (atoms_per_frame)
       * ((bonds_per_carbon) / (bonds_per_carbon + 1.0));
-//  std::cout << "bonds_per_carbon" << bonds_per_carbon << std::endl;
-//  std::cout << "number_of_bonds  " << number_of_bonds << std::endl;
+    std::cout << "bonds_per_carbon" << bonds_per_carbon << std::endl;
+    std::cout << "number_of_bonds  " << number_of_bonds << std::endl;
 //For each bond in the frame, instantiate it and add it to the bondholder vector
   for (int i = 0; i < number_of_bonds; i++) {
     bondholder->push_back(

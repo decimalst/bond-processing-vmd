@@ -107,6 +107,7 @@ void simulation::perl_formatter() {
         //then it's right bond
         vector1 = molecules->at(bond).getMoleculeTrajectory()
             ->get_trajectory_array()->at(frame);
+        write_to_file << " " << vector1.get_x() << " " << vector1.get_y() << " " << vector1.get_z() << std::endl;
       }
       if (bonds_per_carbon == 2) {
         //then it's a left bond
@@ -140,7 +141,6 @@ void simulation::calculate_second_legendre() {
 void simulation::calculate_first_and_second_legendre() {
 //Calculates first and second legendre polynomials
   int number_of_bonds = number_of_molecules;
-  ;
   int bonds_per_carbon = get_molecules()->at(0).getNumberOfBonds();
   int number_of_frames = get_number_of_frames();
   double x1, y1, z1, xx1, yy1, zz1, xy1, xz1, yz1;
