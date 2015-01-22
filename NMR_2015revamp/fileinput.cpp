@@ -51,10 +51,10 @@ int dppccarbonssn2bonds[] =
     { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3 };
 int dppccarbonssn2size = 15;
 std::string* dppc_carbons_sn2_ptr = &dppccarbonssn2[0];
-std::string psmcarbons[] = { "C2" };
+std::string psmcarbons[] = { "C2S","C7F" };
 int psmcarbonbonds[] =
-    { 1 };
-int psmcarbonssize = 1;
+    { 1, 2 };
+int psmcarbonssize = 2;
 std::string* psm_carbons_ptr = &psmcarbons[0];
 
 
