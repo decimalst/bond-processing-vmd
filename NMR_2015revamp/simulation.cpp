@@ -58,30 +58,27 @@ void simulation::calculate_deuterium_order_parameter() {
 //Assumes that the z axis is in the upwards z direction: this may need to be
 //Changed depending on the simulation orientation.
   vector_3d zaxis = vector_3d(0.0, 0.0, 1.0);
-
-  float average_over_ensemble = 0.0;
+  float average_over_sim = 0.0;
 //Declare vector of size equal to the number of bonds in the simulation
 //In this vector we will store the angle for each bond with z axis
 //Once the vector has the angle of the entire simulation added, we
 //average using the number of frames in the simulation.
   std::vector<float> angleholder(number_of_molecules);
+  std::vector<float> scdholder(number_of_molecules);
   std::cout << angleholder.size() << " " << molecules->size() << std::endl;
-  for (int i = 0; i < number_of_molecules; i++) {
-    //std::cout << i << std::endl;
-    for (int j = 0; j < number_of_frames; j++) {
-      //std::cout << "i " << i << " j " << j << " num_of_frames " << number_of_frames << std::endl;
-      angleholder[i] += fabs(
-          ((3 / 2)
-              * pow(
-                  cos(molecules->at(i).getMoleculeTrajectory()
-                      ->get_trajectory_array()->at(j).get_angle_from(&zaxis)),
-                  2)) - 0.5);
+
+  for (int j = 0; j < number_of_frames; j++) {
+    for (int i = 0; i < number_of_molecules; i++) {
+      scdholder[i] += (1.5 * pow(molecules->at(i).getMoleculeTrajectory()
+                                ->get_trajectory_array()->at(j).get_dot_product(&zaxis), 2)) - 0.5;
+
     }
-    angleholder[i] = angleholder[i] / (float) number_of_frames;
-    average_over_ensemble += angleholder[i];
   }
-  average_over_ensemble = average_over_ensemble / number_of_molecules;
-  std::cout << average_over_ensemble << std::endl;
+  for (int i=0; i <number_of_molecules; i++){
+    average_over_sim+=scdholder[i] / number_of_frames;
+  }
+  average_over_sim = average_over_sim / (float)number_of_molecules;
+  std::cout << fabs(average_over_sim) << std::endl;
 
 }
 void simulation::perl_formatter() {
@@ -107,16 +104,19 @@ void simulation::perl_formatter() {
         //then it's right bond
         vector1 = molecules->at(bond).getMoleculeTrajectory()
             ->get_trajectory_array()->at(frame);
-        write_to_file << " " << vector1.get_x() << " " << vector1.get_y() << " " << vector1.get_z() << std::endl;
+        write_to_file << " " << vector1.get_x() << " " << vector1.get_y() << " "
+                      << vector1.get_z() << std::endl;
       }
       if (bonds_per_carbon == 2) {
         //then it's a left bond
         vector1 = molecules->at(bond).getMoleculeTrajectory()
             ->get_trajectory_array()->at(frame);
-        write_to_file << bond/(bonds_per_carbon) << " " << vector1.get_x() << " " << vector1.get_y() << " " << vector1.get_z();
-        vector1 = molecules->at(bond+1).getMoleculeTrajectory()
+        write_to_file << bond / (bonds_per_carbon) << " " << vector1.get_x()
+                      << " " << vector1.get_y() << " " << vector1.get_z();
+        vector1 = molecules->at(bond + 1).getMoleculeTrajectory()
             ->get_trajectory_array()->at(frame);
-        write_to_file << " " << vector1.get_x() << " " << vector1.get_y() << " " << vector1.get_z() << std::endl;
+        write_to_file << " " << vector1.get_x() << " " << vector1.get_y() << " "
+                      << vector1.get_z() << std::endl;
 
       }
       if (bonds_per_carbon == 3) {
@@ -138,7 +138,7 @@ void simulation::perl_formatter() {
 void simulation::calculate_second_legendre() {
 //Calculates second legendre polynomial and writes it to a text file
 }
-void simulation::calculate_first_and_second_legendre() {
+void simulation::calculate_first_and_second_legendre(std::string outfile) {
 //Calculates first and second legendre polynomials
   int number_of_bonds = number_of_molecules;
   int bonds_per_carbon = get_molecules()->at(0).getNumberOfBonds();
@@ -150,8 +150,7 @@ void simulation::calculate_first_and_second_legendre() {
   vector_3d vector1, vector2;
 
   std::string filename;
-  filename = molecules->at(0).getName() + "_"
-      + molecules->at(0).getMoleculeType() + "_legendre";
+  filename = outfile + "_legendre";
 
   std::ofstream write_to_file(filename);
   write_to_file << "# t" << " " << "<x(0)x(t)>" << " " << "<y(0)y(t)>" << " "

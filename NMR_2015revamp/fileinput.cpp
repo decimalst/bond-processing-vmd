@@ -1,4 +1,4 @@
-/*
+  /*
  * fileinput.cpp
  *
  *  Created on: Dec 23, 2014
@@ -51,10 +51,10 @@ int dppccarbonssn2bonds[] =
     { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3 };
 int dppccarbonssn2size = 15;
 std::string* dppc_carbons_sn2_ptr = &dppccarbonssn2[0];
-std::string psmcarbons[] = { "C2S","C7F", "C15F" };
+std::string psmcarbons[] = { "C2S","C2F", "C3F", "C4F", "C5F", "C7F", "C8F", "C9F", "C10F", "C11F", "C12F", "C13F", "C14F","C15F" };
 int psmcarbonbonds[] =
-    { 1, 2, 2 };
-int psmcarbonssize = 2;
+    { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+int psmcarbonssize = 14;
 std::string* psm_carbons_ptr = &psmcarbons[0];
 
 
@@ -123,8 +123,8 @@ int fileinput::find_in_array(std::string check_this, std::string* array_in,
     if (array_in[i] == check_this) {
       index = i;
     }
-    return index;
   }
+  return index;
 }
 std::vector<molecule_bond>* fileinput::loadmolecules() {
   int bonds_per_carbon = 0;
@@ -158,6 +158,7 @@ std::vector<molecule_bond>* fileinput::loadmolecules() {
   }
   if (lipid_name == "psm"){
     index_of_size= find_in_array(carbon_name, psm_carbons_ptr, psmcarbonssize);
+    std::cout << index_of_size << std::endl;
     bonds_per_carbon=psmcarbonbonds[index_of_size];
   }
 //Reads through .xyz file one line at a time, for each molecule, creates a trajectory for each C-H bond

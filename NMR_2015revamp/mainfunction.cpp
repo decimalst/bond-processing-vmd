@@ -98,7 +98,7 @@ int simulation_test() {
   std::cout << "number of frames " << newsim->get_number_of_frames()
             << std::endl;
   newsim->calculate_deuterium_order_parameter();
-  newsim->calculate_first_and_second_legendre();
+  newsim->calculate_first_and_second_legendre("newsim");
   return 1;
 }
 void debug_test() {
@@ -112,10 +112,10 @@ void debug_test() {
   std::cout << "number of frames " << newsim->get_number_of_frames()
             << std::endl;
   newsim->calculate_deuterium_order_parameter();
-  newsim->calculate_first_and_second_legendre();
+  newsim->calculate_first_and_second_legendre("test");
 }
 
-int main(void) {
+int main(int argc, char* argv[]) {
 //  coords_3d_test();
 //  vector_3d_test();
 // fileinput_test();
@@ -127,34 +127,47 @@ int main(void) {
   std::string filename;
   std::string carbonname;
   std::string lipidname;
-  std::cout << "Please input .xyz file name" << std::endl;
+  bool skip_prompt = false;
+  if(argc > 1){
+  if (std::string(argv[1])=="-np"){
+    skip_prompt= true;
+    filename = std::string(argv[2]);
+    carbonname = std::string(argv[3]);
+    lipidname = std::string(argv[4]);
+    choice = atoi(argv[5]);
+    std::cout << filename << " " << carbonname << " " << lipidname << std::endl;
 
-  std::cin >> filename;
-  std::cout << "Please input carbon name(e.g. 'C22')" << std::endl;
-  std::cin >> carbonname;
-  std::cout << "Please input lipid name(e.g. 'dopc')" << std::endl;
-  std::cin >> lipidname;
-  std::cout << "You have selected " << lipidname << " carbon: " << carbonname
-            << " from file " << filename << std::endl;
-  std::cout
-      << "Input 1 to calculate SCD parameter only, input 2 to calculate first and second Legendre polynomial only, input 3 to calculate both, input 4 to perl format the bonds"
-      << std::endl;
-
-  std::cin >> inputchoice;
-  choice=stoi(inputchoice);
-  if (choice == 1 || choice == 2 || choice == 3 || choice==4) {
-    isvalid=true;
   }
-  while (!isvalid) {
+  }
+  if (!skip_prompt) {
+    std::cout << "Please input .xyz file name" << std::endl;
+
+    std::cin >> filename;
+    std::cout << "Please input carbon name(e.g. 'C22')" << std::endl;
+    std::cin >> carbonname;
+    std::cout << "Please input lipid name(e.g. 'dopc')" << std::endl;
+    std::cin >> lipidname;
+    std::cout << "You have selected " << lipidname << " carbon: " << carbonname
+              << " from file " << filename << std::endl;
+    std::cout
+        << "Input 1 to calculate SCD parameter only, input 2 to calculate first and second Legendre polynomial only, input 3 to calculate both, input 4 to perl format the bonds"
+        << std::endl;
+
+    std::cin >> inputchoice;
+    choice = stoi(inputchoice);
+    if (choice == 1 || choice == 2 || choice == 3 || choice == 4) {
+      isvalid = true;
+    }
+    while (!isvalid) {
       std::cout << "Invalid choice, try again" << std::endl;
       isvalid = false;
       std::cin >> inputchoice;
-      choice=stoi(inputchoice);
+      choice = stoi(inputchoice);
       if (choice == 1 || choice == 2 || choice == 3) {
-          isvalid=true;
-        }
+        isvalid = true;
+      }
+    }
   }
-
   fileinput* working = new fileinput(filename, carbonname, lipidname);
   working->is_file_valid();
   std::vector<molecule_bond>* mol_bond;
@@ -164,13 +177,13 @@ int main(void) {
     worksim.calculate_deuterium_order_parameter();
   }
   if (choice == 2) {
-    worksim.calculate_first_and_second_legendre();
+    worksim.calculate_first_and_second_legendre(filename);
   }
   if (choice == 3) {
     worksim.calculate_deuterium_order_parameter();
-    worksim.calculate_first_and_second_legendre();
+    worksim.calculate_first_and_second_legendre(filename);
   }
-  if (choice ==4) {
+  if (choice == 4) {
     worksim.perl_formatter();
   }
 

@@ -25,7 +25,7 @@ class simulation{
   void calculate_deuterium_order_parameter();
   void perl_formatter();
   void calculate_second_legendre();
-  void calculate_first_and_second_legendre();
+  void calculate_first_and_second_legendre(std::string);
   simulation();
   ~simulation();
   simulation(std::vector<molecule_bond>*);

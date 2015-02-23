@@ -5,6 +5,7 @@
  *      Author: byronl
  */
 #include "vector_3d.h"
+#include <iostream>
 
 double vector_3d::get_x(){
   return x_coord;
@@ -27,7 +28,7 @@ void vector_3d::set_z(double input){
 
 double vector_3d::get_dot_product(vector_3d* input){
   //Dot product is = x1*x2 + y1*y2 + z1*z2
-  return (get_x() * input->get_x()) + (get_y() * input->get_y()) + (get_z() * input->get_z());
+  return ((get_x()) * input->get_x()) + (get_y() * input->get_y()) + (get_z() * input->get_z());
 }
 
 double vector_3d::get_magnitude(){
@@ -37,7 +38,7 @@ double vector_3d::get_magnitude(){
 double vector_3d::get_angle_from(vector_3d* input){
 //Get angle from a given vector, using the dot product
 //Given in degrees
-  return acos(get_dot_product(input)/(get_magnitude()*input->get_magnitude()));
+  return acos(get_dot_product(input)/((get_magnitude()*input->get_magnitude())));
 }
 
 vector_3d::vector_3d(double x, double y, double z){
@@ -55,9 +56,9 @@ vector_3d::vector_3d(coords_3d source, coords_3d dest){
   double temp_y;
   double temp_z;
   double magnitude;
-  temp_x=dest.getX() - source.getX();
-  temp_y=dest.getY() - source.getY();
-  temp_z=dest.getZ() - source.getZ();
+  temp_x=(dest.getX() - source.getX());
+  temp_y=(dest.getY() - source.getY());
+  temp_z=(dest.getZ() - source.getZ());
   magnitude= sqrt(pow(temp_x,2) + pow(temp_y,2) + pow(temp_z,2));
   temp_x=temp_x*(1.0/magnitude);
   temp_y=temp_y*(1.0/magnitude);
@@ -65,5 +66,4 @@ vector_3d::vector_3d(coords_3d source, coords_3d dest){
   x_coord=temp_x;
   y_coord=temp_y;
   z_coord=temp_z;
-  //TODO: finish constructor to give a unit vector output
 }
